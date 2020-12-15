@@ -22,6 +22,11 @@ import collections
 import random
 import tokenization
 import tensorflow as tf
+import sys
+
+sys.path.insert(0, "/Users/bbaykara/PycharmProjects/MorphologicalTokenizers")
+# from turkish_root_morphological_tokenizer import TurkishRootMorphologicalTokenizer
+from tokenizer_factory import Tokenizers
 
 flags = tf.flags
 
@@ -207,7 +212,9 @@ def create_training_instances(input_files, tokenizer, max_seq_length,
   all_documents = [x for x in all_documents if x]
   rng.shuffle(all_documents)
 
-  vocab_words = list(tokenizer.vocab.keys())
+  #vocab_words = list(tokenizer.vocab.keys())
+  vocab_words = list(tokenizer.vocab.word2idx.keys())
+
   instances = []
   for _ in range(dupe_factor):
     for document_index in range(len(all_documents)):
@@ -436,8 +443,11 @@ def truncate_seq_pair(tokens_a, tokens_b, max_num_tokens, rng):
 def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
 
-  tokenizer = tokenization.FullTokenizer(
-      vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
+  tokenizer_type = "tr_root_morph"
+  tokenizer = Tokenizers(tokenizer_type).tokenizer
+  #tokenizer = TurkishRootMorphologicalTokenizer("/Users/bbaykara/PycharmProjects/MorphologicalTokenizers/data/zemberek-full.jar")
+  tokenizer.load("/Users/bbaykara/PycharmProjects/MorphologicalTokenizers/files/tr_root_morph_50000")
+  #tokenizer = tokenization.FullTokenizer(vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
 
   input_files = []
   for input_pattern in FLAGS.input_file.split(","):
